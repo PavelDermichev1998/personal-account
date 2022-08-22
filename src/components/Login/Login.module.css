@@ -1,0 +1,26 @@
+import React from 'react'
+import {FormControl, FormGroup, FormLabel, TextField, Button} from '@material-ui/core'
+
+export const Login = () => {
+
+    return <form>
+        <FormControl>
+            <FormLabel>
+                LOG IN
+            </FormLabel>
+            <FormGroup>
+                <TextField
+                    label="Email"
+                    margin="normal"
+                />
+                <TextField
+                    type="password"
+                    label="Password"
+                    margin="normal"
+                />
+                <Button type={'submit'} variant={'contained'} color={'primary'}>Login</Button>
+            </FormGroup>
+        </FormControl>
+    </form>
+
+}
