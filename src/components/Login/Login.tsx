@@ -1,73 +1,52 @@
-import React from 'react';
+import React, {ChangeEvent, useState} from 'react'
+import {FormControl, FormGroup, FormLabel, TextField, Button} from '@material-ui/core'
+import style from './Login.module.css'
+import {AppRootStateType, useAppDispatch} from "../../store/store";
+import {setIsLoggedInAC} from "./login-reducer";
+import {useSelector} from "react-redux";
+import {Navigate} from "react-router-dom";
 
-import { Formik } from 'formik';
-import { Navigate } from 'react-router-dom';
+export const Login: React.FC = () => {
+    const dispatch = useAppDispatch()
+    const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
+    const [login, setLogin] = useState<string>('')
+    const [password, setPassword] = useState<string>('')
 
-import { ReturnComponentType } from '../../n4-types';
-import { useAppSelector, useTypedDispatch } from '../../n5-bll/redux';
+    const loginHandler = (e: ChangeEvent<HTMLInputElement>) => {
+        setLogin(e.currentTarget.value)
+    }
+    const passwordHandler = (e: ChangeEvent<HTMLInputElement>) => {
+        setPassword(e.currentTarget.value)
+    }
+    const loginClick = () => {
+        dispatch(setIsLoggedInAC({value: true}))
+    }
 
-import { validate } from './l1-components/helpers/util-validate-FuncForm';
-import { LoginFooter } from './l1-components/LoginFooter';
-import { SuperInput } from './l1-components/SuperInput';
-import { loginTC } from './login-reducer';
-import s from './LoginStyle.module.css';
 
-export enum TitleFormik {
-  email = 'email',
-  emailTitle = 'email',
-  password = 'password',
-  passwordTitle = 'password',
-  rememberMe = 'rememberMe',
-  initEmail = '',
-  initPassword = '',
-  text = 'text',
+    if (isLoggedIn) {
+        return <Navigate to={"/"}/>
+    }
+    return <form className={style.form_container}>
+        <FormControl>
+            <FormLabel>
+                Login to personal account
+            </FormLabel>
+            <FormGroup>
+                <TextField
+                    label="Login"
+                    margin="normal"
+                    value={login}
+                    onChange={loginHandler}
+                />
+                <TextField
+                    type="password"
+                    label="Password"
+                    margin="normal"
+                    value={password}
+                    onChange={passwordHandler}
+                />
+                <Button type={'submit'} variant={'contained'} color={'primary'} onClick={loginClick}>Login</Button>
+            </FormGroup>
+        </FormControl>
+    </form>
 }
-
-export const Login = (): ReturnComponentType => {
-  const isLoggedIn = useAppSelector(state => state.login.isAuth);
-
-  const dispatch = useTypedDispatch();
-
-  if (isLoggedIn) return <Navigate to="/profile" />;
-
-  return (
-    <div className={s.loginContainer}>
-      <h1>Sign In</h1>
-      <Formik
-        initialValues={{
-          email: TitleFormik.initEmail,
-          password: TitleFormik.initPassword,
-          rememberMe: false,
-        }}
-        validate={values => validate(values)}
-        onSubmit={(values, { setSubmitting }) => {
-          setSubmitting(false);
-
-          dispatch(loginTC(values));
-        }}
-      >
-        {({ values, errors, handleChange, handleSubmit }) => (
-          <form onSubmit={handleSubmit} className={s.form}>
-            <SuperInput
-              title={TitleFormik.emailTitle}
-              name={TitleFormik.email}
-              type={TitleFormik.email}
-              handleChange={handleChange}
-              value={values.email}
-              error={errors.email}
-            />
-            <SuperInput
-              title={TitleFormik.passwordTitle}
-              name={TitleFormik.password}
-              type={TitleFormik.password}
-              handleChange={handleChange}
-              value={values.password}
-              error={errors.password}
-            />
-            <LoginFooter value={values.rememberMe} handleChange={handleChange} />
-          </form>
-        )}
-      </Formik>
-    </div>
-  );
-};
